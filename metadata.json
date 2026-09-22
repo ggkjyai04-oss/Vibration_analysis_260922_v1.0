@@ -1,0 +1,8 @@
+{
+  "name": "Remix 진동 이상 징후 감지 및 실시간 알림 시스템_mode switching_v1.0",
+  "description": "갤럭시 S24 울트라 가속도/모션 센서 기반 실시간 진동 분석, 이상 징후 감지 및 즉각 경보 모니터링 시스템",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
