@@ -19,6 +19,7 @@ import { DeviceConnectorModal } from "./components/DeviceConnectorModal";
 import { GeminiDiagnosisModal } from "./components/GeminiDiagnosisModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { SensorNodeMobileView } from "./components/SensorNodeMobileView";
+import { CsvAnalysisModal } from "./components/CsvAnalysisModal";
 
 import {
   Smartphone,
@@ -34,6 +35,7 @@ import {
   Download,
   Sun,
   Moon,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default function App() {
@@ -101,7 +103,24 @@ export default function App() {
   // Modals state
   const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
   const [diagnosisTargetAnomaly, setDiagnosisTargetAnomaly] = useState<AnomalyEvent | null>(null);
+
+  // Apply parsed CSV vibration dataset directly to real-time monitor
+  const handleApplyCsvToMonitor = (csvSamples: VibrationSample[], csvAnomalies: AnomalyEvent[]) => {
+    setIsSimulating(false); // Pause simulator so CSV waveform is clearly visible
+    if (csvSamples.length > 0) {
+      setSamples(csvSamples.slice(-200));
+    }
+    if (csvAnomalies.length > 0) {
+      setAnomalies((prev) => {
+        const seen = new Set(prev.map((a) => a.id));
+        const filtered = csvAnomalies.filter((a) => !seen.has(a.id));
+        return [...filtered, ...prev].slice(0, 50);
+      });
+      setActiveAlert(csvAnomalies[0]);
+    }
+  };
 
   // Audio mute
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -502,8 +521,8 @@ export default function App() {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 tracking-tight">
-                  Galaxy S24 Ultra 진동 센서 이상 감지 시스템
+                <h1 id="vibration-system-title" className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 tracking-tight">
+                  진동 이상 감지 시스템
                 </h1>
                 <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 font-semibold">
                   {theme === "night" ? "v2.4 Night Mode Sentinel" : "v2.4 Day Mode Sentinel"}
@@ -549,6 +568,17 @@ export default function App() {
                   <span className="font-mono text-[11px]">Night 모드</span>
                 </>
               )}
+            </button>
+
+            {/* CSV Data Upload & Analysis button */}
+            <button
+              id="open-csv-upload-btn"
+              onClick={() => setIsCsvModalOpen(true)}
+              className="px-3 py-1.5 bg-cyan-50 dark:bg-cyan-950/60 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 font-medium rounded-lg flex items-center space-x-1.5 shadow-2xs transition-colors cursor-pointer"
+              title="CSV 진동 데이터 파일 업로드 및 ISO 10816 / FFT 분석"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span>CSV 데이터 분석</span>
             </button>
 
             {/* Galaxy S24 Ultra QR link modal button */}
@@ -643,6 +673,7 @@ export default function App() {
           onInjectSpike={handleInjectSpike}
           isSimulating={isSimulating}
           onToggleSimulation={() => setIsSimulating((s) => !s)}
+          onOpenCsvAnalysis={() => setIsCsvModalOpen(true)}
         />
 
         {/* Real-time Anomaly Alerts Feed & AI Diagnostics */}
@@ -691,6 +722,15 @@ export default function App() {
         onClose={() => setDiagnosisTargetAnomaly(null)}
         recentAvgRms={currentRms}
         recentPeak={peakMagnitude}
+      />
+
+      <CsvAnalysisModal
+        isOpen={isCsvModalOpen}
+        onClose={() => setIsCsvModalOpen(false)}
+        config={config}
+        theme={theme}
+        onApplyToMonitor={handleApplyCsvToMonitor}
+        onRequestAiDiagnosis={(anomaly) => setDiagnosisTargetAnomaly(anomaly)}
       />
     </div>
   );

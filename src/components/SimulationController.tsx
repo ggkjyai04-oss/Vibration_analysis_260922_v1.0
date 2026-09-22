@@ -1,6 +1,6 @@
 import React from "react";
 import { SimulationScenario } from "../types";
-import { Sliders, AlertTriangle, Play, Sparkles } from "lucide-react";
+import { Sliders, AlertTriangle, Play, Sparkles, FileSpreadsheet } from "lucide-react";
 
 interface Props {
   currentScenario: SimulationScenario;
@@ -8,6 +8,7 @@ interface Props {
   onInjectSpike: () => void;
   isSimulating: boolean;
   onToggleSimulation: () => void;
+  onOpenCsvAnalysis?: () => void;
 }
 
 const SCENARIOS: {
@@ -60,6 +61,7 @@ export const SimulationController: React.FC<Props> = ({
   onInjectSpike,
   isSimulating,
   onToggleSimulation,
+  onOpenCsvAnalysis,
 }) => {
   return (
     <div id="simulation-controller" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs space-y-4 transition-colors">
@@ -72,6 +74,16 @@ export const SimulationController: React.FC<Props> = ({
           </span>
         </div>
         <div className="flex items-center space-x-2">
+          {onOpenCsvAnalysis && (
+            <button
+              onClick={onOpenCsvAnalysis}
+              className="px-2.5 py-1 rounded-lg text-xs font-medium flex items-center space-x-1.5 bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-950/60 dark:hover:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 transition-colors shadow-2xs cursor-pointer"
+              title="CSV 진동 데이터 파일 업로드 및 분석기 열기"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span>CSV 분석기</span>
+            </button>
+          )}
           <button
             onClick={onToggleSimulation}
             className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition-all shadow-2xs ${

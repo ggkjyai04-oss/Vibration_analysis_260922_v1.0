@@ -68,3 +68,44 @@ export type SimulationScenario =
   | "SEISMIC_TREMOR"
   | "IMPACT_SHOCK"
   | "RESONANCE_SWEEP";
+
+export interface CsvVibrationPoint {
+  index: number;
+  time: number; // seconds
+  timestamp?: number;
+  x: number;
+  y: number;
+  z: number;
+  magnitude: number;
+  filteredMagnitude: number;
+  rms: number;
+}
+
+export interface CsvAnalysisSummary {
+  fileName: string;
+  fileSizeFormatted?: string;
+  totalPoints: number;
+  durationSeconds: number;
+  sampleRateHz: number;
+  overallRms: number;
+  peakMagnitude: number;
+  peakToPeak: number;
+  kurtosis: number;
+  crestFactor: number;
+  dominantFrequency: number;
+  topFrequencies: { freq: number; mag: number }[];
+  isoSeverity: {
+    class: string;
+    color: string;
+    status: "GOOD" | "ACCEPTABLE" | "UNSATISFACTORY" | "UNACCEPTABLE";
+    description: string;
+  };
+  axisStats: {
+    x: { min: number; max: number; rms: number; peak: number };
+    y: { min: number; max: number; rms: number; peak: number };
+    z: { min: number; max: number; rms: number; peak: number };
+  };
+  detectedAnomalies: AnomalyEvent[];
+  points: CsvVibrationPoint[];
+}
+
